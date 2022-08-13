@@ -1,11 +1,12 @@
 import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
-import { todosState } from "./atoms";
+import { ITodoState, todosState } from "./atoms";
 import Board from "./components/Board";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -37,21 +38,22 @@ const Icon = styled.span`
 `;
 const PlusIcon = styled(Icon)`
   position: absolute;
-  right: -15%;
+  right: -17%;
   color: #02ca2a;
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 700;
-  margin-left: 20px;
+  margin: 0 20px;
   padding: 6px 10px;
 `;
-const RemoveIcon = styled(Icon)<{isDraggingFrom: boolean}>`
+const RemoveIcon = styled(Icon)<{ isDraggingFrom: boolean }>`
   font-size: 32px;
   position: fixed;
   bottom: 5%;
   left: 48%;
   color: tomato;
   padding: 13px 15px;
-  background-color: ${props => props.isDraggingFrom ? 'aliceblue' : 'rgba(225, 225, 225, 0.7)'};
+  background-color: ${(props) =>
+    props.isDraggingFrom ? "aliceblue" : "rgba(225, 225, 225, 0.7)"};
 `;
 
 function App() {
@@ -59,16 +61,19 @@ function App() {
   const onDragEnd = ({ destination, source }: DropResult) => {
     if (!destination) return;
 
+    let newTodos = {} as ITodoState;
+
     if (destination.droppableId === "remove") {
       setTodos((prev) => {
         const boardCopy = [...prev[source.droppableId]];
         boardCopy.splice(source.index, 1);
-        return {
+
+        newTodos = {
           ...prev,
           [source.droppableId]: boardCopy,
         };
+        return newTodos;
       });
-      return;
     }
 
     if (destination.droppableId === source.droppableId) {
@@ -77,10 +82,12 @@ function App() {
         const target = boardCopy[source.index];
         boardCopy.splice(source.index, 1);
         boardCopy.splice(destination?.index, 0, target);
-        return {
+
+        newTodos = {
           ...prev,
           [source.droppableId]: boardCopy,
         };
+        return newTodos;
       });
     } else {
       setTodos((prev) => {
@@ -89,21 +96,51 @@ function App() {
         const destCopy = [...prev[destination.droppableId]];
         sourceCopy.splice(source.index, 1);
         destCopy.splice(destination?.index, 0, target);
-        return {
+
+        newTodos = {
           ...prev,
           [source.droppableId]: sourceCopy,
           [destination.droppableId]: destCopy,
         };
+        return newTodos;
       });
     }
+
+    // 전체 저장
+    setTimeout(() => {
+      Object.keys(newTodos).forEach((todo) => {
+        localStorage.setItem(todo, JSON.stringify(newTodos[todo]));
+      });
+    }, 0);
   };
+
+  // 로컬스토리지에 저장된 todos 불러오기
+  useEffect(() => {
+    Object.keys(todos).forEach((key) => {
+      const getTodos = localStorage.getItem(key);
+      if(getTodos === null) return;
+
+      const savedTodos = JSON.parse(getTodos);
+        setTodos((prev) => {
+        return {
+          ...prev,
+          [key]: savedTodos,
+        }
+      });
+      })
+  }, []);
+
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
           <Boards>
             {Object.keys(todos).map((boardId) => (
-              <Board todos={todos[boardId]} boardId={boardId} key={boardId} />
+              <Board
+                boardTodos={todos[boardId]}
+                boardId={boardId}
+                key={boardId}
+              />
             ))}
           </Boards>
           <PlusIcon>
