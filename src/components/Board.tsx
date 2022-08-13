@@ -10,6 +10,7 @@ const Wrapper = styled.div`
   padding: 20px 0px;
   border-radius: 3px;
   min-height: 300px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
 `;
