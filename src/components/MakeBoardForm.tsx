@@ -13,8 +13,7 @@ const Form = styled.form`
   top: 0px;
   display: flex;
   justify-content: center;
-  padding-top: 50px;
-  padding-bottom: 30px;
+  padding: 50px 0;
 `;
 
 const BoardNameInput = styled.input`

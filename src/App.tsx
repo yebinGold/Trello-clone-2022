@@ -1,9 +1,4 @@
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
 import { ITodoState, todosState } from "./atoms";
@@ -28,6 +23,8 @@ const Boards = styled.div`
   width: 100%;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  padding: 20px 0;
+  margin-top: 30px;
 `;
 
 function App() {
@@ -36,19 +33,6 @@ function App() {
     if (!destination) return;
 
     let newTodos = {} as ITodoState;
-
-    if (destination.droppableId === "remove") {
-      setTodos((prev) => {
-        const boardCopy = [...prev[source.droppableId]];
-        boardCopy.splice(source.index, 1);
-
-        newTodos = {
-          ...prev,
-          [source.droppableId]: boardCopy,
-        };
-        return newTodos;
-      });
-    }
 
     if (destination.droppableId === source.droppableId) {
       setTodos((prev) => {
@@ -64,45 +48,64 @@ function App() {
         return newTodos;
       });
     } else {
-      setTodos((prev) => {
-        const sourceCopy = [...prev[source.droppableId]];
-        const target = sourceCopy[source.index];
-        const destCopy = [...prev[destination.droppableId]];
-        sourceCopy.splice(source.index, 1);
-        destCopy.splice(destination?.index, 0, target);
+      if (destination.droppableId === "remove") {
+        setTodos((prev) => {
+          const boardCopy = [...prev[source.droppableId]];
+          boardCopy.splice(source.index, 1);
 
-        newTodos = {
-          ...prev,
-          [source.droppableId]: sourceCopy,
-          [destination.droppableId]: destCopy,
-        };
-        return newTodos;
-      });
+          newTodos = {
+            ...prev,
+            [source.droppableId]: boardCopy,
+          };
+          return newTodos;
+        });
+      } else {
+        setTodos((prev) => {
+          const sourceCopy = [...prev[source.droppableId]];
+          const target = sourceCopy[source.index];
+          const destCopy = [...prev[destination.droppableId]];
+          sourceCopy.splice(source.index, 1);
+          destCopy.splice(destination?.index, 0, target);
+
+          newTodos = {
+            ...prev,
+            [source.droppableId]: sourceCopy,
+            [destination.droppableId]: destCopy,
+          };
+          return newTodos;
+        });
+      }
     }
 
     // 전체 저장
     setTimeout(() => {
-      Object.keys(newTodos).forEach((todo) => {
-        localStorage.setItem(todo, JSON.stringify(newTodos[todo]));
-      });
+      // Object.keys(newTodos).forEach((todo) => {
+      //   localStorage.setItem(todo, JSON.stringify(newTodos[todo]));
+      // });
+      localStorage.setItem("todoBoards", JSON.stringify(newTodos));
     }, 0);
   };
 
   // 로컬스토리지에 저장된 todos 불러오기
   useEffect(() => {
-    Object.keys(todos).forEach((key) => {
-      const getTodos = localStorage.getItem(key);
-      if (getTodos === null) return;
+    const getTodos = localStorage.getItem("todoBoards");
+    if (getTodos === null) return;
+    
+    const savedTodos = JSON.parse(getTodos);
 
-      const savedTodos = JSON.parse(getTodos);
+    Object.keys(savedTodos).forEach((key) => {
       setTodos((prev) => {
         return {
           ...prev,
-          [key]: savedTodos,
+          [key]: savedTodos[key],
         };
       });
     });
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("todoBoards", JSON.stringify(todos));
+  }, [todos])
 
   return (
     <>

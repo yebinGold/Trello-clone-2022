@@ -3,7 +3,7 @@ import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import DraggableCard from "./DraggableCard";
 import { ITodo, todosState } from "./../atoms";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
 const Wrapper = styled.div`
   background-color: ${(props) => props.theme.boardColor};
@@ -38,8 +38,6 @@ const Area = styled.div<IArea>`
   transition: background-color 0.3s ease-in-out;
   padding: 20px;
 `;
-const EachBoard = styled.div`
-`;
 
 const Form = styled.form`
   width: 100%;
@@ -62,27 +60,20 @@ interface IForm {
 }
 
 const Board = ({ boardTodos, boardId }: IBoard) => {
-  const [todos, setTodos] = useRecoilState(todosState);
+  const setTodos = useSetRecoilState(todosState);
   const { register, handleSubmit, setValue } = useForm<IForm>();
   const onValid = ({ todo }: IForm) => {
     const newTodo = {
       id: Date.now(),
       text: todo,
     };
-    let newList = [] as ITodo[];
     setTodos((prev) => {
-      newList = [newTodo, ...prev[boardId]];
       return {
         ...prev,
-        [boardId]: newList,
+        [boardId]: [newTodo, ...prev[boardId]],
       };
     });
     setValue("todo", "");
-
-    // 배열 업데이트
-    setTimeout(() => {
-      localStorage.setItem(boardId, JSON.stringify(newList));
-    }, 0);
   };
   return (
     <Wrapper>
@@ -96,7 +87,7 @@ const Board = ({ boardTodos, boardId }: IBoard) => {
       </Form>
       <Droppable droppableId={boardId}>
         {(provided, snapshot) => (
-           <Area
+          <Area
             isDraggingOver={snapshot.isDraggingOver}
             isDraggingFrom={Boolean(snapshot.draggingFromThisWith)}
             ref={provided.innerRef}
