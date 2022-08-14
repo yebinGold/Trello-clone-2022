@@ -64,6 +64,7 @@ const GlobalStyle = createGlobalStyle`
 	body {
 	  font-family: 'Archivo', sans-serif;
 	  background-color:${(props) => props.theme.bgColor};
+	  padding: 85px 0;
 	}
 	a {
 	  text-decoration:none;

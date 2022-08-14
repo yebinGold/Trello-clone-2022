@@ -38,6 +38,8 @@ const Area = styled.div<IArea>`
   transition: background-color 0.3s ease-in-out;
   padding: 20px;
 `;
+const EachBoard = styled.div`
+`;
 
 const Form = styled.form`
   width: 100%;
@@ -94,7 +96,7 @@ const Board = ({ boardTodos, boardId }: IBoard) => {
       </Form>
       <Droppable droppableId={boardId}>
         {(provided, snapshot) => (
-          <Area
+           <Area
             isDraggingOver={snapshot.isDraggingOver}
             isDraggingFrom={Boolean(snapshot.draggingFromThisWith)}
             ref={provided.innerRef}

@@ -1,12 +1,16 @@
-import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 import styled from "styled-components";
 import { useRecoilState } from "recoil";
 import { ITodoState, todosState } from "./atoms";
 import Board from "./components/Board";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect } from "react";
+import MakeBoardForm from "./components/MakeBoardForm";
+import RemoveBlock from "./components/RemoveBlock";
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,7 +19,7 @@ const Wrapper = styled.div`
   margin: 0 auto;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 80vh;
   position: relative;
 `;
 
@@ -24,36 +28,6 @@ const Boards = styled.div`
   width: 100%;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-`;
-
-const Icon = styled.span`
-  font-weight: 700;
-  border: 2px solid whitesmoke;
-  border-radius: 35px;
-  background-color: rgba(225, 225, 225, 0.7);
-  transition: all 0.3s ease-in-out;
-  &:hover {
-    background-color: aliceblue;
-  }
-`;
-const PlusIcon = styled(Icon)`
-  position: absolute;
-  right: -17%;
-  color: #02ca2a;
-  font-size: 42px;
-  font-weight: 700;
-  margin: 0 20px;
-  padding: 6px 10px;
-`;
-const RemoveIcon = styled(Icon)<{ isDraggingFrom: boolean }>`
-  font-size: 32px;
-  position: fixed;
-  bottom: 5%;
-  left: 48%;
-  color: tomato;
-  padding: 13px 15px;
-  background-color: ${(props) =>
-    props.isDraggingFrom ? "aliceblue" : "rgba(225, 225, 225, 0.7)"};
 `;
 
 function App() {
@@ -118,20 +92,21 @@ function App() {
   useEffect(() => {
     Object.keys(todos).forEach((key) => {
       const getTodos = localStorage.getItem(key);
-      if(getTodos === null) return;
+      if (getTodos === null) return;
 
       const savedTodos = JSON.parse(getTodos);
-        setTodos((prev) => {
+      setTodos((prev) => {
         return {
           ...prev,
           [key]: savedTodos,
-        }
+        };
       });
-      })
+    });
   }, []);
 
   return (
     <>
+      <MakeBoardForm />
       <DragDropContext onDragEnd={onDragEnd}>
         <Wrapper>
           <Boards>
@@ -143,21 +118,8 @@ function App() {
               />
             ))}
           </Boards>
-          <PlusIcon>
-            <FontAwesomeIcon icon={faPlus} />
-          </PlusIcon>
         </Wrapper>
-        <Droppable droppableId="remove">
-          {(provided, snapshot) => (
-            <RemoveIcon
-              isDraggingFrom={Boolean(snapshot.draggingFromThisWith)}
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              <FontAwesomeIcon icon={faTrashCan} />
-            </RemoveIcon>
-          )}
-        </Droppable>
+        <RemoveBlock />
       </DragDropContext>
     </>
   );
