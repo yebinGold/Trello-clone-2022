@@ -20,8 +20,8 @@ const Wrapper = styled.div`
 `;
 
 const Boards = styled.div`
-  display: grid;
   width: 100%;
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 20px 0;
@@ -37,17 +37,7 @@ function App() {
     let newTodos = {} as ITodoState;
 
     if (type === "board") {
-      destination.droppableId === "remove"
-        ? setTodos((prev) => {
-            const allBoardCopy = Object.entries({ ...prev });
-            allBoardCopy.splice(source.index, 1);
-            newTodos = {
-              ...Object.fromEntries(allBoardCopy),
-            };
-
-            return newTodos;
-          })
-        : setTodos((prev) => {
+      setTodos((prev) => {
             const allBoardCopy = Object.entries({ ...prev });
             const target = allBoardCopy[source.index];
             allBoardCopy.splice(source.index, 1);
@@ -138,6 +128,7 @@ function App() {
           <Droppable
             droppableId="boardDrop"
             type="board"
+            direction="horizontal"
           >
             {(provided) => (
               <Boards {...provided.droppableProps} ref={provided.innerRef}>

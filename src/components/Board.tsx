@@ -6,6 +6,7 @@ import { ITodo, todosState } from "./../atoms";
 import { useSetRecoilState } from "recoil";
 
 const Wrapper = styled.div`
+  position: relative;
   background-color: ${(props) => props.theme.boardColor};
   padding: 20px 0px;
   border-radius: 3px;
@@ -19,6 +20,13 @@ const Title = styled.h1`
   text-align: center;
   margin-bottom: 20px;
   font-weight: 800;
+`;
+
+const DeleteMark = styled.span`
+  position: absolute;
+  right: 10%;
+  font-size: 13px;
+  cursor: pointer;
 `;
 
 interface IArea {
@@ -76,11 +84,21 @@ const Board = ({ boardTodos, boardId, idx }: IBoard) => {
     });
     setValue("todo", "");
   };
+
+  const deleteBoard = (boardId: string) => {
+    setTodos((prev) => {
+      const AllBoards = { ...prev };
+      delete AllBoards[boardId];
+      return AllBoards;
+    });
+  };
+
   return (
     <Draggable draggableId={boardId} index={idx}>
       {(provided) => (
         <Wrapper ref={provided.innerRef} {...provided.draggableProps}>
           <Title {...provided.dragHandleProps}>{boardId}</Title>
+          <DeleteMark onClick={() => deleteBoard(boardId)}>❌</DeleteMark>
           <Form onSubmit={handleSubmit(onValid)}>
             <input
               {...register("todo", { required: true })}

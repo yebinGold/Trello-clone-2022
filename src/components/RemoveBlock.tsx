@@ -12,6 +12,7 @@ const RemoveWrapper = styled.div`
   z-index: 100;
   bottom: 0px;
   display: flex;
+  flex-grow: 1;
   justify-content: center;
   align-items: center;
   padding-bottom: 20px;
@@ -34,14 +35,11 @@ const RemoveBlock = () => {
   return (
     <Droppable droppableId="remove">
       {(provided, snapshot) => (
-        <RemoveWrapper>
-          <RemoveIcon
-            isDraggingover={Boolean(snapshot.draggingOverWith)}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
+        <RemoveWrapper ref={provided.innerRef} {...provided.droppableProps}>
+          <RemoveIcon isDraggingover={Boolean(snapshot.draggingOverWith)}>
             <FontAwesomeIcon icon={faTrashCan} />
           </RemoveIcon>
+          {provided.placeholder}
         </RemoveWrapper>
       )}
     </Droppable>

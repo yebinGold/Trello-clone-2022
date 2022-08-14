@@ -55,7 +55,7 @@ const MakeBoardForm = () => {
       <BoardNameInput
         value={name}
         onChange={onChange}
-        placeholder="Create a new board"
+        placeholder="Create a new board ✔️"
       />
     </Form>
   );
