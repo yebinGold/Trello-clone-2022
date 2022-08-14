@@ -49,7 +49,6 @@ const MakeBoardForm = () => {
       };
     });
     setName("");
-    localStorage.setItem(name, JSON.stringify([])); // 새 배열 추가
   };
   return (
     <Form onSubmit={onSubmit}>
